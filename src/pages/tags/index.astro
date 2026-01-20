@@ -1,0 +1,174 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import PostCard from "../../components/PostCard.astro";
+
+const posts = await getCollection("posts", ({ data }) => !data.draft);
+
+// 收集所有标签
+const allTagsSet = new Set<string>();
+for (const post of posts) {
+  for (const tag of post.data.tags) {
+    allTagsSet.add(tag);
+  }
+}
+const allTags = Array.from(allTagsSet).sort();
+
+// 按日期排序所有文章
+const sortedPosts = posts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+// 尝试从查询参数获取选中的标签（静态模式下可能获取不到）
+const tagParam = Astro.url.searchParams.get("tag");
+const selectedTag = tagParam ? decodeURIComponent(tagParam) : null;
+---
+
+<Layout>
+  <section class="w-full" data-tags-page>
+    <!-- 标签列表 -->
+    <div class="mt-6 flex flex-wrap gap-2" data-tags-list>
+      {allTags.map((tag) => {
+        const isSelected = tag === selectedTag;
+        return (
+          <a
+            href={isSelected ? "/tags" : `/tags?tag=${encodeURIComponent(tag)}`}
+            data-tag={tag}
+            class={`text-sm px-2 py-1 rounded transition-colors ${
+              isSelected
+                ? "text-slate-900 dark:text-slate-100 font-medium"
+                : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
+            }`}
+          >
+            #{tag}
+          </a>
+        );
+      })}
+    </div>
+
+    <!-- 所有文章列表（服务器端渲染，每个文章携带标签数组） -->
+    <div class="mt-8 divide-y divide-slate-200 dark:divide-slate-800" data-posts-list>
+      {sortedPosts.map((post) => {
+        const postTags = post.data.tags;
+        const shouldShow = !selectedTag || postTags.includes(selectedTag);
+        return (
+          <div
+            data-post-tags={JSON.stringify(postTags)}
+            class={shouldShow ? "" : "hidden"}
+          >
+            <PostCard
+              slug={post.slug}
+              title={post.data.title}
+              date={post.data.date}
+              author={post.data.author}
+              excerpt={post.data.excerpt}
+              tags={postTags}
+              selectedTag={selectedTag}
+            />
+          </div>
+        );
+      })}
+      {selectedTag &&
+        sortedPosts.filter((post) => post.data.tags.includes(selectedTag))
+          .length === 0 && (
+          <p class="py-8 text-sm text-slate-500" data-empty-msg>
+            该标签下暂无文章
+          </p>
+        )}
+    </div>
+  </section>
+
+  <style is:inline>
+    /* 默认隐藏所有文章，JavaScript 会立即显示符合条件的 */
+    [data-tags-page] [data-post-tags]:not([data-init-shown]) {
+      display: none;
+    }
+  </style>
+
+  <script is:inline>
+    (function initTagsPage() {
+      const tagsPage = document.querySelector('[data-tags-page]');
+      if (!tagsPage) return;
+
+      const tagsList = tagsPage.querySelector('[data-tags-list]');
+      const postsList = tagsPage.querySelector('[data-posts-list]');
+      if (!tagsList || !postsList) return;
+
+      // 获取查询参数
+      const urlParams = new URLSearchParams(window.location.search);
+      const tagParam = urlParams.get("tag");
+      const selectedTag = tagParam ? decodeURIComponent(tagParam) : null;
+
+      // 更新标签样式和链接
+      const tagLinks = tagsList.querySelectorAll('[data-tag]');
+      tagLinks.forEach((link) => {
+        const tag = link.getAttribute("data-tag");
+        if (tag && tag === selectedTag) {
+          link.className = "text-sm px-2 py-1 rounded transition-colors text-slate-900 dark:text-slate-100 font-medium";
+          link.href = "/tags";
+        } else if (tag) {
+          link.className = "text-sm px-2 py-1 rounded transition-colors text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300";
+          link.href = `/tags?tag=${encodeURIComponent(tag)}`;
+        }
+      });
+
+      // 根据选中的标签过滤显示文章
+      const articleWrappers = postsList.querySelectorAll('[data-post-tags]');
+      let hasVisiblePosts = false;
+
+      // 移除之前可能添加的空消息
+      const existingEmptyMsg = postsList.querySelector('p[data-empty-msg]');
+      if (existingEmptyMsg) {
+        existingEmptyMsg.remove();
+      }
+
+      articleWrappers.forEach((wrapper) => {
+        const tagsJson = wrapper.getAttribute("data-post-tags");
+        if (!tagsJson) {
+          wrapper.classList.add("hidden");
+          return;
+        }
+
+        const tags = JSON.parse(tagsJson);
+        const shouldShow = !selectedTag || tags.includes(selectedTag);
+
+        if (shouldShow) {
+          wrapper.classList.remove("hidden");
+          wrapper.setAttribute("data-init-shown", "true");
+          hasVisiblePosts = true;
+
+          // 更新文章内标签的样式
+          const postCard = wrapper.querySelector("article");
+          if (postCard) {
+            const tagLinks = postCard.querySelectorAll('a[href^="/tags?tag="]');
+            tagLinks.forEach((tagLink) => {
+              const href = tagLink.getAttribute("href");
+              if (href) {
+                const match = href.match(/tag=([^&]+)/);
+                if (match) {
+                  const tag = decodeURIComponent(match[1]);
+                  if (tag === selectedTag) {
+                    tagLink.className = "text-(--brand)";
+                  } else {
+                    tagLink.className = "hover:text-(--brand)";
+                  }
+                }
+              }
+            });
+          }
+        } else {
+          wrapper.classList.add("hidden");
+        }
+      });
+
+      // 如果没有可见的文章，显示提示
+      if (selectedTag && !hasVisiblePosts) {
+        const emptyMsg = document.createElement("p");
+        emptyMsg.className = "py-8 text-sm text-slate-500 dark:text-slate-400";
+        emptyMsg.setAttribute("data-empty-msg", "true");
+        emptyMsg.textContent = "该标签下暂无文章";
+        postsList.appendChild(emptyMsg);
+      }
+    })();
+  </script>
+</Layout>

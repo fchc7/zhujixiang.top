@@ -1,7 +1,47 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { siGithub } from "simple-icons";
 ---
 
 <Layout>
-  <h1>About</h1>
+  <section class="w-full">
+    <div class="py-16">
+      <div class="flex items-start gap-6 mb-6">
+        <img
+          src="/avatar.jpeg"
+          alt="fchc7"
+          class="w-20 h-20 rounded-full object-cover shrink-0"
+        />
+        <div class="flex-1">
+          <h1 class="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 mb-4">
+            fchc7
+          </h1>
+          <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
+            前端开发者，专注于构建简洁、可维护的 Web 应用。主要使用 <span class="font-medium text-slate-900 dark:text-slate-100">TypeScript</span> 和 <span class="font-medium text-slate-900 dark:text-slate-100">Rust</span> 进行开发。
+          </p>
+          
+          <div class="flex items-center gap-4">
+            <a
+              href="https://github.com/fchc7"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+              aria-label="GitHub"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                role="img"
+              >
+                <path d={siGithub.path} />
+              </svg>
+              <span class="text-sm">GitHub</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </Layout>

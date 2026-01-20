@@ -1,0 +1,59 @@
+---
+interface Props {
+  slug: string;
+  title: string;
+  date: Date | string;
+  author: string;
+  excerpt: string;
+  tags: string[];
+  selectedTag?: string | null;
+}
+
+const {
+  slug,
+  title,
+  date,
+  author,
+  excerpt,
+  tags,
+  selectedTag = null,
+} = Astro.props;
+
+const dateObj = typeof date === "string" ? new Date(date) : date;
+const dateStr = dateObj.toLocaleDateString("zh-CN", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<article class="py-8">
+  <div class="text-xs text-slate-500 dark:text-slate-400">
+    <time datetime={dateObj.toISOString()}>
+      {dateStr}
+    </time>
+    <span class="mx-2">by</span>
+    <span>{author}</span>
+  </div>
+
+  <h2 class="mt-2 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+    <a href={`/articles/${slug}`} class="hover:text-(--brand)">
+      {title}
+    </a>
+  </h2>
+
+  <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+    {excerpt}
+  </p>
+
+  <div class="mt-4 flex flex-wrap gap-x-3 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
+    {tags.map((tag) => (
+      <a
+        href={`/tags?tag=${encodeURIComponent(tag)}`}
+        class={tag === selectedTag ? "text-(--brand)" : "hover:text-(--brand)"}
+      >
+        #{tag}
+      </a>
+    ))}
+  </div>
+</article>
