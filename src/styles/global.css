@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+:root {
+  --brand: #991b1b;
+}
+
+/* Markdown 内容基础排版（配合 Tailwind Preflight） */
+.md-content {
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.75rem; /* leading-7 */
+  color: #1e293b; /* slate-800 */
+}
+
+.md-content :where(p) {
+  margin-top: 1rem;
+}
+
+.md-content :where(h2) {
+  margin-top: 2.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #0f172a; /* slate-900 */
+}
+
+.md-content :where(h3) {
+  margin-top: 2rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #0f172a; /* slate-900 */
+}
+
+.md-content :where(ul) {
+  margin-top: 1rem;
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.md-content :where(ol) {
+  margin-top: 1rem;
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+
+.md-content :where(li) {
+  margin-top: 0.5rem;
+}
+
+.md-content :where(a) {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.md-content :where(code):not(pre code) {
+  border-radius: 0.25rem;
+  background: #f1f5f9; /* slate-100 */
+  padding: 0.125rem 0.25rem;
+  font-size: 0.75rem; /* text-xs */
+  color: #0f172a; /* slate-900 */
+}
+
+.md-content :where(pre) {
+  margin-top: 1rem;
+  overflow-x: auto;
+  border-radius: 0.25rem;
+  background: #020617; /* slate-950 */
+  padding: 1rem;
+  font-size: 0.75rem; /* text-xs */
+  line-height: 1.5rem; /* leading-6 */
+  color: #f1f5f9; /* slate-100 */
+}
+
+.md-content :where(pre code) {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}

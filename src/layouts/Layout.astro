@@ -1,22 +1,122 @@
+---
+import "../styles/global.css";
+
+const pathname =
+  Astro.url?.pathname ??
+  (Astro.request?.url ? new URL(Astro.request.url).pathname : "/");
+
+const navItems: Array<{ href: string; label: string }> = [
+  { href: "/", label: "Articles" },
+  { href: "/about", label: "About" },
+];
+
+const isActive = (href: string) => {
+  // 首页就是 Articles；同时把 /articles 也视为 Articles（配合重定向/兼容旧链接）
+  if (href === "/") return pathname === "/" || pathname.startsWith("/articles");
+  return pathname === href || pathname.startsWith(`${href}/`);
+};
+
+const splitLastN = (label: string, n = 3) => {
+  const chars = Array.from(label);
+  if (chars.length <= n) return { prefix: "", suffix: label };
+  return {
+    prefix: chars.slice(0, -n).join(""),
+    suffix: chars.slice(-n).join(""),
+  };
+};
+---
+
 <!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Astro Basics</title>
+  </head>
+  <body class="[--content-w:960px]">
+    <header
+      class="flex fixed top-0 left-0 z-40 w-full h-32 bg-white border-b border-slate-200"
+    >
+      <div
+        class="w-full h-full grid grid-cols-[1fr_minmax(0,var(--content-w))_1fr]"
+      >
+        <div></div>
+        <nav class="min-w-0 flex items-end gap-8 p-4">
+          {
+            navItems.map((item) => {
+              const active = isActive(item.href);
+              const showTagMark =
+                pathname.startsWith("/tags") && item.href === "/";
+              const { prefix, suffix } = splitLastN(item.label, 3);
+              return (
+                <a
+                  href={item.href}
+                  class="inline-flex items-baseline text-base font-bold"
+                >
+                  {prefix}
+                  <span class={`relative ${active ? "text-(--brand)" : ""}`}>
+                    {suffix}
+                    {showTagMark && (
+                      <span
+                        class="absolute top-0 -right-3 text-(--brand) text-sm leading-none"
+                        aria-hidden="true"
+                      >
+                        #
+                      </span>
+                    )}
+                  </span>
+                </a>
+              );
+            })
+          }
+        </nav>
+        <div></div>
+      </div>
+    </header>
+    <main class="w-full h-full pt-32">
+      <div
+        class="w-full h-full grid grid-cols-[1fr_minmax(0,var(--content-w))_1fr]"
+      >
+        <div></div>
+        <div class="min-w-0 p-4 pr-12">
+          <slot />
+        </div>
+        <div></div>
+      </div>
+    </main>
+
+    <!-- 右侧分割线 -->
+    <div
+      class="fixed top-0 left-[calc(50%+min(calc(var(--content-w)/2),50vw))] z-50 h-full w-px bg-white border-l border-slate-200 pointer-events-none"
+    >
+      <!-- 交点四角星（类似北极星） -->
+      <div
+        class="absolute left-0 top-32 -translate-x-1/2 -translate-y-1/2 z-50"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          class="h-5 w-5 text-slate-200"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"
+            fill="white"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linejoin="round"></path>
+        </svg>
+      </div>
+    </div>
+  </body>
 </html>
 
 <style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
 </style>
