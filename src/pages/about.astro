@@ -1,47 +1,107 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { siGithub } from "simple-icons";
+import { siGithub, siTypescript, siRust, siReact, siVuedotjs, siNodedotjs, siElectron, siSwift } from "simple-icons";
+
+const techStack = [
+  { name: "TypeScript", icon: siTypescript, color: "#3178C6" },
+  { name: "Rust", icon: siRust, color: "#DEA584" },
+  { name: "React", icon: siReact, color: "#61DAFB" },
+  { name: "Vue", icon: siVuedotjs, color: "#4FC08D" },
+  { name: "Node.js", icon: siNodedotjs, color: "#339933" },
+  { name: "Electron", icon: siElectron, color: "#47848F" },
+  { name: "Swift", icon: siSwift, color: "#F05138" },
+];
+
+const interests = [
+  "追求极致的用户体验与交互设计",
+  "热衷于探索系统级编程与性能优化",
+  "关注 AI 与开发工具的结合",
+  "喜欢用代码解决实际问题",
+];
 ---
 
 <Layout>
-  <section class="w-full">
-    <div class="py-16">
-      <div class="flex items-start gap-6 mb-6">
-        <img
-          src="/avatar.jpeg"
-          alt="fchc7"
-          class="w-20 h-20 rounded-full object-cover shrink-0"
-        />
-        <div class="flex-1">
-          <h1 class="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 mb-4">
+  <section class="w-full py-10">
+    <!-- 基本信息 -->
+    <div class="flex items-start gap-5 mb-20">
+      <img
+        src="/avatar.jpeg"
+        alt="fchc7"
+        class="w-16 h-16 rounded-full object-cover shrink-0"
+      />
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-2">
+          <h1 class="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             fchc7
           </h1>
-          <p class="text-base text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
-            前端开发者，专注于构建简洁、可维护的 Web 应用。主要使用 <span class="font-medium text-slate-900 dark:text-slate-100">TypeScript</span> 和 <span class="font-medium text-slate-900 dark:text-slate-100">Rust</span> 进行开发。
-          </p>
-          
-          <div class="flex items-center gap-4">
-            <a
-              href="https://github.com/fchc7"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-              aria-label="GitHub"
-            >
-              <svg
-                class="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                role="img"
-              >
-                <path d={siGithub.path} />
-              </svg>
-              <span class="text-sm">GitHub</span>
-            </a>
-          </div>
+          <a
+            href="https://github.com/fchc7"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-slate-400 dark:text-slate-500 hover:text-(--brand) transition-colors"
+            aria-label="GitHub"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d={siGithub.path} />
+            </svg>
+          </a>
         </div>
+        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          全栈开发者，专注于构建<span class="text-slate-900 dark:text-slate-100 font-bold">简洁、高性能</span>的应用。
+          从前端到后端，从 Web 到桌面端，享受用代码创造价值的过程。
+        </p>
       </div>
+    </div>
+
+    <!-- 技术栈 -->
+    <div class="mb-10">
+      <h2 class="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">
+        技术栈
+      </h2>
+      <div class="flex flex-wrap gap-2">
+        {techStack.map((tech) => (
+          <span class="tech-tag" style={`--tag-color: ${tech.color}`}>
+            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d={tech.icon.path} />
+            </svg>
+            <span>{tech.name}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+
+    <!-- 关于我 -->
+    <div class="mb-10">
+      <h2 class="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">
+        关于我
+      </h2>
+      <ul class="space-y-2">
+        {interests.map((item) => (
+          <li class="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400">
+            <span class="text-(--brand) mt-1">›</span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 </Layout>
+
+<style>
+  .tech-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--tag-color);
+    background-color: color-mix(in srgb, var(--tag-color) 10%, transparent);
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+  }
+
+  .tech-tag:hover {
+    background-color: color-mix(in srgb, var(--tag-color) 18%, transparent);
+  }
+</style>

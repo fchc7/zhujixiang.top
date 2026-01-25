@@ -8,6 +8,10 @@
   --content-w: min(100%, calc(100vw - 2rem));
 }
 
+.dark {
+  --brand: #f87171; /* red-400，更柔和且更适合暗色背景 */
+}
+
 /* 响应式内容宽度 */
 @media (min-width: 768px) {
   :root {
