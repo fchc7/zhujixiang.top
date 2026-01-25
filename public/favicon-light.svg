@@ -1,8 +1,3 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <!-- ÛÒb - Er!ñrþ	 -->
-  <path fill="#0f172a" d="M16 2 L17.5 13 L16 14.5 L14.5 13 Z"/>
-  <path fill="#0f172a" d="M16 30 L17.5 19 L16 17.5 L14.5 19 Z"/>
-  <path fill="#0f172a" d="M2 16 L13 14.5 L14.5 16 L13 17.5 Z"/>
-  <path fill="#0f172a" d="M30 16 L19 14.5 L17.5 16 L19 17.5 Z"/>
-  <circle fill="#0f172a" cx="16" cy="16" r="2.5"/>
+  <path fill="#0f172a" d="M16 0 L19 13 L32 16 L19 19 L16 32 L13 19 L0 16 L13 13 Z"/>
 </svg>
