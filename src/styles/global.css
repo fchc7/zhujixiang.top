@@ -6,6 +6,8 @@
 :root {
   --brand: #991b1b;
   --content-w: min(100%, calc(100vw - 2rem));
+  --header-height: 7rem;
+  --header-height-shrunk: 56px;
 }
 
 .dark {

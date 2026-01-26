@@ -81,7 +81,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
     <style>
       /* 初始状态和缩放状态的样式 */
       header#main-header {
-        height: 8rem; /* h-32 = 128px */
+        height: var(--header-height, 8rem);
         transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
                     background-color 0.2s, 
                     border-color 0.2s;
@@ -93,7 +93,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
 
       /* 北极星容器样式 */
       #polaris-container {
-        top: 8rem; /* 初始位置 128px */
+        top: var(--header-height, 8rem);
         transition: top 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
@@ -161,11 +161,11 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
 
       /* 收缩状态下的高度变化 - 使用 :global() 确保能匹配到 body 上的类名 */
       :global(.header-shrunk) header#main-header {
-        height: 56px !important;
+        height: var(--header-height-shrunk, 56px) !important;
       }
 
       :global(.header-shrunk) #polaris-container {
-        top: 56px !important;
+        top: var(--header-height-shrunk, 56px) !important;
       }
 
       /* 回到顶部按钮特定逻辑 */
@@ -239,7 +239,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
   </head>
   <body class="bg-white dark:bg-slate-900 transition-colors">
     <!-- 哨兵元素：用于监听滚动位置 -->
-    <div id="scroll-sentinel" class="absolute top-0 left-0 w-full h-32 pointer-events-none"></div>
+    <div id="scroll-sentinel" class="absolute top-0 left-0 w-full" style="height: var(--header-height, 8rem); pointer-events: none;"></div>
 
     <header
       id="main-header"
@@ -317,7 +317,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
       <!-- 滚动进度条 -->
       <div id="scroll-progress"></div>
     </header>
-    <main class="w-full h-full pt-32">
+    <main class="w-full h-full" style="padding-top: var(--header-height, 8rem);">
       <div
         class="w-full h-full grid grid-cols-[minmax(0,0fr)_minmax(0,var(--content-w))_minmax(0,0fr)] md:grid-cols-[1fr_minmax(0,var(--content-w))_1fr] px-4 md:px-0"
       >
