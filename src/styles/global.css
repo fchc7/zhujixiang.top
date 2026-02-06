@@ -23,15 +23,15 @@
 
 @media (min-width: 1024px) {
   :root {
-    --content-w: 960px;
+    --content-w: 800px;
   }
 }
 
 /* Markdown 内容基础排版（配合 Tailwind Preflight） */
 .md-content {
-  font-size: 0.875rem; /* text-sm */
+  font-size: 0.875rem; /* 13px */
   line-height: 1.75rem; /* leading-7 */
-  color: #1e293b; /* slate-800 */
+  color: #334155; /* slate-700 */
 }
 
 .dark .md-content {
@@ -44,7 +44,7 @@
 
 .md-content :where(h2) {
   margin-top: 2.5rem;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.025em;
   color: #0f172a; /* slate-900 */
@@ -56,14 +56,14 @@
 
 .md-content :where(h3) {
   margin-top: 2rem;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: -0.025em;
-  color: #0f172a; /* slate-900 */
+  color: #1e293b; /* slate-800 */
 }
 
 .dark .md-content :where(h3) {
-  color: #f1f5f9; /* slate-100 */
+  color: #e2e8f0; /* slate-200 */
 }
 
 .md-content :where(ul) {

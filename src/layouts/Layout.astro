@@ -34,23 +34,27 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
   <head>
     <script is:inline>
       // 必须在任何内容渲染前执行，防止 FOUC
-      (function() {
+      (function () {
         try {
-          var theme = localStorage.getItem('theme');
-          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var isDark = theme === 'dark' || (!theme && prefersDark);
+          var theme = localStorage.getItem("theme");
+          var prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
+          var isDark = theme === "dark" || (!theme && prefersDark);
           if (isDark) {
-            document.documentElement.classList.add('dark');
+            document.documentElement.classList.add("dark");
           }
           // 延迟更新 favicon，确保 DOM 已加载
-          var updateFav = function() {
-            var favicon = document.getElementById('favicon');
+          var updateFav = function () {
+            var favicon = document.getElementById("favicon");
             if (favicon) {
-              favicon.href = isDark ? '/favicon-dark.svg' : '/favicon-light.svg';
+              favicon.href = isDark
+                ? "/favicon-dark.svg"
+                : "/favicon-light.svg";
             }
           };
-          if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', updateFav);
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", updateFav);
           } else {
             updateFav();
           }
@@ -82,9 +86,10 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
       /* 初始状态和缩放状态的样式 */
       header#main-header {
         height: var(--header-height, 8rem);
-        transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-                    background-color 0.2s, 
-                    border-color 0.2s;
+        transition:
+          height 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+          background-color 0.2s,
+          border-color 0.2s;
       }
 
       header#main-header nav {
@@ -112,7 +117,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
         position: relative;
         background: transparent;
         z-index: 51;
-        width: 1.25rem;  /* 20px */
+        width: 1.25rem; /* 20px */
         height: 1.25rem; /* 20px */
         display: flex;
         align-items: center;
@@ -239,7 +244,12 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
   </head>
   <body class="bg-white dark:bg-slate-900 transition-colors">
     <!-- 哨兵元素：用于监听滚动位置 -->
-    <div id="scroll-sentinel" class="absolute top-0 left-0 w-full" style="height: var(--header-height, 8rem); pointer-events: none;"></div>
+    <div
+      id="scroll-sentinel"
+      class="absolute top-0 left-0 w-full"
+      style="height: var(--header-height, 8rem); pointer-events: none;"
+    >
+    </div>
 
     <header
       id="main-header"
@@ -259,7 +269,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
               return (
                 <a
                   href={item.href}
-                  class="inline-flex items-baseline text-base font-bold text-slate-900 dark:text-slate-100"
+                  class="inline-flex items-baseline text-lg font-bold text-slate-900 dark:text-slate-100"
                 >
                   {prefix}
                   <span class={`relative ${active ? "text-(--brand)" : ""}`}>
@@ -294,7 +304,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-              />
+              ></path>
             </svg>
             <svg
               id="moon-icon"
@@ -308,7 +318,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
                 stroke-linejoin="round"
                 stroke-width="2"
                 d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-              />
+              ></path>
             </svg>
           </button>
         </nav>
@@ -317,7 +327,10 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
       <!-- 滚动进度条 -->
       <div id="scroll-progress"></div>
     </header>
-    <main class="w-full h-full" style="padding-top: var(--header-height, 8rem);">
+    <main
+      class="w-full h-full"
+      style="padding-top: var(--header-height, 8rem);"
+    >
       <div
         class="w-full h-full grid grid-cols-[minmax(0,0fr)_minmax(0,var(--content-w))_minmax(0,0fr)] md:grid-cols-[1fr_minmax(0,var(--content-w))_1fr] px-4 md:px-0"
       >
@@ -355,10 +368,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
     </div>
 
     <!-- 回到顶部按钮 (位于工具栏区域) -->
-    <button
-      id="back-to-top"
-      aria-label="回到顶部"
-    >
+    <button id="back-to-top" aria-label="回到顶部">
       <svg
         class="w-5 h-5"
         fill="none"
@@ -369,38 +379,41 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
           stroke-linecap="round"
           stroke-linejoin="round"
           stroke-width="2.5"
-          d="M5 15l7-7 7 7"
-        />
+          d="M5 15l7-7 7 7"></path>
       </svg>
     </button>
 
     <!-- 备案号区域：仅首页/文章列表及详情页，固定底部，低调样式 -->
-    {showBeian && (
-      <footer
-        class="beian-footer fixed bottom-0 left-0 right-0 z-10 grid grid-cols-[minmax(0,0fr)_minmax(0,var(--content-w))_minmax(0,0fr)] md:grid-cols-[1fr_minmax(0,var(--content-w))_1fr] px-4 md:px-0 pointer-events-none bg-white dark:bg-slate-900"
-        role="contentinfo"
-      >
-        <div></div>
-        <div class="min-w-0 py-1.5 pr-12 md:pr-12 pl-4">
-          <a
-            href="https://beian.miit.gov.cn/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="beian-link inline-block text-[11px] text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 no-underline transition-colors pointer-events-auto"
-          >
-            {beianNo}
-          </a>
-        </div>
-        <div></div>
-      </footer>
-    )}
+    {
+      showBeian && (
+        <footer
+          class="beian-footer fixed bottom-0 left-0 right-0 z-10 grid grid-cols-[minmax(0,0fr)_minmax(0,var(--content-w))_minmax(0,0fr)] md:grid-cols-[1fr_minmax(0,var(--content-w))_1fr] px-4 md:px-0 pointer-events-none bg-white dark:bg-slate-900"
+          role="contentinfo"
+        >
+          <div />
+          <div class="min-w-0 py-1.5 pr-12 md:pr-12 pl-4">
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="beian-link inline-block text-[11px] text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 no-underline transition-colors pointer-events-auto"
+            >
+              {beianNo}
+            </a>
+          </div>
+          <div />
+        </footer>
+      )
+    }
 
     <script>
       // 更新 favicon 的函数
       function updateFavicon(isDark: boolean) {
-        const favicon = document.getElementById('favicon') as HTMLLinkElement | null;
+        const favicon = document.getElementById(
+          "favicon"
+        ) as HTMLLinkElement | null;
         if (favicon) {
-          favicon.href = isDark ? '/favicon-dark.svg' : '/favicon-light.svg';
+          favicon.href = isDark ? "/favicon-dark.svg" : "/favicon-light.svg";
         }
       }
 
@@ -413,14 +426,16 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
       });
 
       // 监听系统主题变化
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        // 仅在用户未手动设置主题时跟随系统
-        if (!localStorage.getItem('theme')) {
-          const isDark = e.matches;
-          document.documentElement.classList.toggle('dark', isDark);
-          updateFavicon(isDark);
-        }
-      });
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", (e) => {
+          // 仅在用户未手动设置主题时跟随系统
+          if (!localStorage.getItem("theme")) {
+            const isDark = e.matches;
+            document.documentElement.classList.toggle("dark", isDark);
+            updateFavicon(isDark);
+          }
+        });
 
       // 回到顶部逻辑
       const backToTop = document.getElementById("back-to-top");
@@ -436,20 +451,22 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
       const sentinel = document.getElementById("scroll-sentinel");
       const progressBar = document.getElementById("scroll-progress");
       const polaris = document.getElementById("polaris-container");
-      
+
       if (header && sentinel) {
         // 判断是否为文章详情页
-        const isArticleDetail = window.location.pathname.startsWith('/articles/') && 
-                               window.location.pathname !== '/articles' && 
-                               window.location.pathname !== '/articles/';
+        const isArticleDetail =
+          window.location.pathname.startsWith("/articles/") &&
+          window.location.pathname !== "/articles" &&
+          window.location.pathname !== "/articles/";
 
         let ticking = false;
 
         const updateScrollEffects = () => {
           const winScroll = window.scrollY;
-          const height = document.documentElement.scrollHeight - window.innerHeight;
+          const height =
+            document.documentElement.scrollHeight - window.innerHeight;
           const scrolled = height > 0 ? winScroll / height : 0;
-          
+
           // 1. 更新进度条 (仅在详情页更新)
           if (isArticleDetail && progressBar) {
             progressBar.style.transform = `scaleX(${scrolled})`;
@@ -459,34 +476,44 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
           if (isArticleDetail && polaris) {
             const polarisRect = polaris.getBoundingClientRect();
             const currentProgressX = window.innerWidth * scrolled;
-            if (document.body.classList.contains("header-shrunk") && currentProgressX >= polarisRect.left) {
+            if (
+              document.body.classList.contains("header-shrunk") &&
+              currentProgressX >= polarisRect.left
+            ) {
               polaris.classList.add("polaris-active");
             } else {
               polaris.classList.remove("polaris-active");
             }
           }
-          
+
           ticking = false;
         };
 
-        window.addEventListener("scroll", () => {
-          if (!ticking) {
-            window.requestAnimationFrame(updateScrollEffects);
-            ticking = true;
-          }
-        }, { passive: true });
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (!ticking) {
+              window.requestAnimationFrame(updateScrollEffects);
+              ticking = true;
+            }
+          },
+          { passive: true }
+        );
 
         // 1. 使用 Intersection Observer 监听哨兵，控制收缩
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (!entry.isIntersecting) {
-              document.body.classList.add("header-shrunk");
-            } else {
-              // 只要哨兵进入视口（即回到顶部区域），立即恢复高度
-              document.body.classList.remove("header-shrunk");
-            }
-          });
-        }, { threshold: 0 });
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) {
+                document.body.classList.add("header-shrunk");
+              } else {
+                // 只要哨兵进入视口（即回到顶部区域），立即恢复高度
+                document.body.classList.remove("header-shrunk");
+              }
+            });
+          },
+          { threshold: 0 }
+        );
 
         observer.observe(sentinel);
 
@@ -498,7 +525,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
         };
 
         window.addEventListener("resize", checkState);
-        
+
         // 如果页面内容是动态的，还可以观察 body 高度
         const resizeObserver = new ResizeObserver(checkState);
         resizeObserver.observe(document.body);
