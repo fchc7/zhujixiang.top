@@ -1,0 +1,170 @@
+---
+interface HeadingItem {
+  id: string;
+  text: string;
+  depth: 2 | 3;
+}
+
+interface Props {
+  items: HeadingItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav
+  id="table-of-contents"
+  class="toc-container hidden md:block"
+  aria-label="文章目录"
+>
+  <ul class="toc-list">
+    {
+      items.map((item, index) => (
+        <li>
+          <a
+            class="toc-item"
+            href={`#${item.id}`}
+            data-depth={item.depth}
+            data-index={index}
+            data-target={item.id}
+          >
+            <span class="toc-line" />
+            <span class="toc-text">{item.text}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .toc-container {
+    position: fixed;
+    left: calc(50% + min(calc(var(--content-w) / 2), 50vw));
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+    padding-top: 2rem;
+    z-index: 49;
+    pointer-events: none;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.5rem 0;
+    color: #d4a4a4;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    cursor: pointer;
+  }
+
+  :global(.dark) .toc-item {
+    color: #fecaca;
+  }
+
+  .toc-text {
+    position: absolute;
+    left: 100%;
+    margin-left: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap;
+    transition:
+      opacity 0.2s,
+      visibility 0.2s;
+    pointer-events: none;
+  }
+
+  .toc-line {
+    display: block;
+    height: 1px;
+    background-color: currentColor;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+  }
+
+  .toc-item[data-depth="2"] .toc-line {
+    width: 2rem;
+  }
+
+  .toc-item[data-depth="3"] .toc-line {
+    width: 1.5rem;
+  }
+
+  .toc-item:hover {
+    color: var(--brand);
+  }
+
+  .toc-item:hover .toc-text {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .toc-item.active {
+    color: var(--brand);
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  const tocItems = document.querySelectorAll(".toc-item");
+  const headings = document.querySelectorAll("h2, h3");
+
+  tocItems.forEach((item) => {
+    item.addEventListener("click", (e) => {
+      const id = item.getAttribute("data-target");
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (target) {
+        e.preventDefault();
+        const rect = target.getBoundingClientRect();
+        const offset = window.innerHeight * 0.3;
+        const top = window.scrollY + rect.top - offset;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    });
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          tocItems.forEach((item) => {
+            const target = item.getAttribute("data-target");
+            if (target === id) {
+              item.classList.add("active");
+            } else {
+              item.classList.remove("active");
+            }
+          });
+        }
+      });
+    },
+    {
+      rootMargin: "-10% 0px -80% 0px",
+      threshold: 0,
+    }
+  );
+
+  headings.forEach((heading) => observer.observe(heading));
+</script>

@@ -1,6 +1,10 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { getCollection } from "astro:content";
+import { remark } from 'remark';
+import { visit } from 'unist-util-visit';
+import type { Root, Heading } from 'mdast';
+import TableOfContents from "../../components/TableOfContents.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts", ({ data }) => !data.draft);
@@ -12,6 +16,35 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await post.render();
+
+const headings: Array<{ id: string; text: string; depth: 2 | 3 }> = [];
+
+const headingPlugin = () => {
+  return (tree: Root) => {
+    visit(tree, 'heading', (node) => {
+      const heading = node as Heading;
+      
+      if (heading.depth === 2 || heading.depth === 3) {
+        const text = heading.children
+          ?.map(c => 'value' in c ? c.value : '')
+          .join('')
+          .trim();
+        
+        if (!text) return;
+        
+        const id = text
+          .toLowerCase()
+          .replace(/[^\w\u4e00-\u9fa5\s-]/g, '')
+          .replace(/\s+/g, '-');
+        
+        headings.push({ id, text, depth: heading.depth as 2 | 3 });
+      }
+    });
+  };
+};
+
+const tree = remark().parse(post.body);
+await remark().use(headingPlugin).run(tree);
 ---
 
 <Layout>
@@ -60,6 +93,8 @@ const { Content } = await post.render();
       <Content />
     </div>
   </article>
+  
+  {headings.length > 0 && <TableOfContents items={headings} />}
 </Layout>
 
 <style>
