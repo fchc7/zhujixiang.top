@@ -50,8 +50,8 @@ const interests = [
           </a>
         </div>
         <p class="about-intro">
-          一名全栈开发者，也在意文字、节奏和界面的呼吸感。
-          这个站点是私人索引，记录写作、代码、工具与偶尔慢下来的时刻。
+          一名全栈开发者，也在意文字、节奏和界面的呼吸感。这个站点像一份私人索引，
+          记录写作、代码、工具，以及偶尔慢下来的时刻。
         </p>
       </div>
     </div>
@@ -60,14 +60,14 @@ const interests = [
   <section class="about-section">
     <div class="section-rule"></div>
     <div class="about-grid">
-      <div>
+      <section class="about-column">
         <p class="eyebrow">focus</p>
         <ul class="about-list">
           {interests.map((item) => <li>{item}</li>)}
         </ul>
-      </div>
+      </section>
 
-      <div>
+      <section class="about-column">
         <p class="eyebrow">stack</p>
         <div class="stack-list">
           {techStack.map((tech) => (
@@ -79,19 +79,19 @@ const interests = [
             </span>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   </section>
 </Layout>
 
 <style>
   .about-hero {
-    padding: 1.8rem 0 2.6rem;
+    padding: 2.4rem 0 3.4rem;
   }
 
   .about-head {
     display: grid;
-    gap: 1.4rem;
+    gap: 1.8rem;
     align-items: start;
   }
 
@@ -104,11 +104,15 @@ const interests = [
     box-shadow: var(--shadow-soft);
   }
 
+  .about-copy {
+    min-width: 0;
+  }
+
   .about-name-row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-top: 0.8rem;
+    margin-top: 0.95rem;
   }
 
   .about-name {
@@ -130,39 +134,47 @@ const interests = [
   }
 
   .about-intro {
-    max-width: 35rem;
-    margin: 1rem 0 0;
+    max-width: 37rem;
+    margin: 1.45rem 0 0;
     color: var(--text-muted);
     font-size: 0.94rem;
-    line-height: 2;
+    line-height: 2.05;
   }
 
   .about-section {
-    padding-bottom: 2rem;
+    padding-bottom: 3rem;
   }
 
   .about-grid {
     display: grid;
-    gap: 2rem;
-    padding-top: 1.6rem;
+    gap: 2.8rem;
+    padding-top: 2.2rem;
+  }
+
+  .about-column {
+    min-width: 0;
   }
 
   .about-list {
-    margin: 1rem 0 0;
+    max-width: 28rem;
+    margin: 1.25rem 0 0;
     padding: 0;
     list-style: none;
     color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 2;
   }
 
   .about-list li + li {
-    margin-top: 0.85rem;
+    margin-top: 1rem;
   }
 
   .stack-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.85rem 1rem;
-    margin-top: 1rem;
+    gap: 1rem 1.2rem;
+    margin-top: 1.25rem;
+    max-width: 24rem;
   }
 
   .stack-item {
@@ -171,17 +183,19 @@ const interests = [
     gap: 0.5rem;
     color: var(--text-muted);
     font-size: 0.8rem;
+    line-height: 1.7;
   }
 
   @media (min-width: 768px) {
     .about-head {
       grid-template-columns: auto minmax(0, 1fr);
-      gap: 1.8rem;
+      gap: 2.2rem;
     }
 
     .about-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 3rem;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+      gap: 4.25rem;
+      padding-top: 2.6rem;
     }
   }
 </style>
