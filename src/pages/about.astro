@@ -1,107 +1,187 @@
 ---
+import {
+  siElectron,
+  siGithub,
+  siNodedotjs,
+  siReact,
+  siRust,
+  siSwift,
+  siTypescript,
+  siVuedotjs,
+} from "simple-icons";
 import Layout from "../layouts/Layout.astro";
-import { siGithub, siTypescript, siRust, siReact, siVuedotjs, siNodedotjs, siElectron, siSwift } from "simple-icons";
 
 const techStack = [
-  { name: "TypeScript", icon: siTypescript, color: "#3178C6" },
-  { name: "Rust", icon: siRust, color: "#DEA584" },
-  { name: "React", icon: siReact, color: "#61DAFB" },
-  { name: "Vue", icon: siVuedotjs, color: "#4FC08D" },
-  { name: "Node.js", icon: siNodedotjs, color: "#339933" },
-  { name: "Electron", icon: siElectron, color: "#47848F" },
-  { name: "Swift", icon: siSwift, color: "#F05138" },
+  { name: "TypeScript", icon: siTypescript },
+  { name: "Rust", icon: siRust },
+  { name: "React", icon: siReact },
+  { name: "Vue", icon: siVuedotjs },
+  { name: "Node.js", icon: siNodedotjs },
+  { name: "Electron", icon: siElectron },
+  { name: "Swift", icon: siSwift },
 ];
 
 const interests = [
-  "追求极致的用户体验与交互设计",
-  "热衷于探索系统级编程与性能优化",
-  "关注 AI 与开发工具的结合",
-  "喜欢用代码解决实际问题",
+  "关注简洁、耐久、可长期维护的产品体验。",
+  "喜欢把复杂的交互与系统问题做得更轻、更快、更顺手。",
+  "持续记录 AI、开发工具与个人工作流之间的交汇处。",
 ];
 ---
 
 <Layout>
-  <section class="w-full py-10">
-    <!-- 基本信息 -->
-    <div class="flex items-start gap-5 mb-20">
-      <img
-        src="/avatar.jpeg"
-        alt="fchc7"
-        class="w-16 h-16 rounded-full object-cover shrink-0"
-      />
-      <div class="flex-1">
-        <div class="flex items-center gap-2 mb-2">
-          <h1 class="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            fchc7
-          </h1>
+  <section class="about-hero">
+    <div class="about-head">
+      <img src="/avatar.jpeg" alt="Zhu Jixiang" class="about-avatar" />
+
+      <div class="about-copy">
+        <p class="eyebrow">about the author</p>
+        <div class="about-name-row">
+          <h1 class="about-name">fchc7 / Zhu Jixiang</h1>
           <a
             href="https://github.com/fchc7"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-slate-400 dark:text-slate-500 hover:text-(--brand) transition-colors"
+            class="about-link"
             aria-label="GitHub"
           >
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path d={siGithub.path} />
+            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path d={siGithub.path}></path>
             </svg>
           </a>
         </div>
-        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-          全栈开发者，专注于构建<span class="text-slate-900 dark:text-slate-100 font-bold">简洁、高性能</span>的应用。
-          从前端到后端，从 Web 到桌面端，享受用代码创造价值的过程。
+        <p class="about-intro">
+          一名全栈开发者，也在意文字、节奏和界面的呼吸感。
+          这个站点是私人索引，记录写作、代码、工具与偶尔慢下来的时刻。
         </p>
       </div>
     </div>
+  </section>
 
-    <!-- 技术栈 -->
-    <div class="mb-10">
-      <h2 class="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">
-        技术栈
-      </h2>
-      <div class="flex flex-wrap gap-2">
-        {techStack.map((tech) => (
-          <span class="tech-tag" style={`--tag-color: ${tech.color}`}>
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path d={tech.icon.path} />
-            </svg>
-            <span>{tech.name}</span>
-          </span>
-        ))}
+  <section class="about-section">
+    <div class="section-rule"></div>
+    <div class="about-grid">
+      <div>
+        <p class="eyebrow">focus</p>
+        <ul class="about-list">
+          {interests.map((item) => <li>{item}</li>)}
+        </ul>
       </div>
-    </div>
 
-    <!-- 关于我 -->
-    <div class="mb-10">
-      <h2 class="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">
-        关于我
-      </h2>
-      <ul class="space-y-2">
-        {interests.map((item) => (
-          <li class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-            <span class="text-(--brand)">›</span>
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
+      <div>
+        <p class="eyebrow">stack</p>
+        <div class="stack-list">
+          {techStack.map((tech) => (
+            <span class="stack-item">
+              <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d={tech.icon.path}></path>
+              </svg>
+              <span>{tech.name}</span>
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   </section>
 </Layout>
 
 <style>
-  .tech-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.25rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--tag-color);
-    background-color: color-mix(in srgb, var(--tag-color) 10%, transparent);
-    border-radius: 9999px;
-    transition: background-color 0.2s ease;
+  .about-hero {
+    padding: 1.8rem 0 2.6rem;
   }
 
-  .tech-tag:hover {
-    background-color: color-mix(in srgb, var(--tag-color) 18%, transparent);
+  .about-head {
+    display: grid;
+    gap: 1.4rem;
+    align-items: start;
+  }
+
+  .about-avatar {
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 1.5rem;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .about-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.8rem;
+  }
+
+  .about-name {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(1.8rem, 1.3rem + 2vw, 3rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+  }
+
+  .about-link {
+    color: var(--text-faint);
+    transition: color 0.2s ease;
+  }
+
+  .about-link:hover {
+    color: var(--brand);
+  }
+
+  .about-intro {
+    max-width: 35rem;
+    margin: 1rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.94rem;
+    line-height: 2;
+  }
+
+  .about-section {
+    padding-bottom: 2rem;
+  }
+
+  .about-grid {
+    display: grid;
+    gap: 2rem;
+    padding-top: 1.6rem;
+  }
+
+  .about-list {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--text-muted);
+  }
+
+  .about-list li + li {
+    margin-top: 0.85rem;
+  }
+
+  .stack-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem 1rem;
+    margin-top: 1rem;
+  }
+
+  .stack-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  @media (min-width: 768px) {
+    .about-head {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 1.8rem;
+    }
+
+    .about-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 3rem;
+    }
   }
 </style>

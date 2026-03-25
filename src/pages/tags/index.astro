@@ -1,174 +1,165 @@
 ---
-import Layout from "../../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import PostCard from "../../components/PostCard.astro";
+import Layout from "../../layouts/Layout.astro";
 
-const posts = await getCollection("posts", ({ data }) => !data.draft);
-
-// 收集所有标签
-const allTagsSet = new Set<string>();
-for (const post of posts) {
-  for (const tag of post.data.tags) {
-    allTagsSet.add(tag);
-  }
-}
-const allTags = Array.from(allTagsSet).sort();
-
-// 按日期排序所有文章
-const sortedPosts = posts.sort(
+const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
 
-// 尝试从查询参数获取选中的标签（静态模式下可能获取不到）
-const tagParam = Astro.url.searchParams.get("tag");
-const selectedTag = tagParam ? decodeURIComponent(tagParam) : null;
+const allTags = Array.from(
+  new Set(posts.flatMap((post) => post.data.tags))
+).sort((a, b) => a.localeCompare(b, "zh-CN"));
 ---
 
 <Layout>
-  <section class="w-full" data-tags-page>
-    <!-- 标签列表 -->
-    <div class="mt-6 flex flex-wrap gap-2" data-tags-list>
-      {allTags.map((tag) => {
-        const isSelected = tag === selectedTag;
-        return (
-          <a
-            href={isSelected ? "/tags" : `/tags?tag=${encodeURIComponent(tag)}`}
-            data-tag={tag}
-            class={`text-sm px-2 py-1 rounded transition-colors ${
-              isSelected
-                ? "text-slate-900 dark:text-slate-100 font-medium"
-                : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
-            }`}
-          >
-            #{tag}
-          </a>
-        );
-      })}
-    </div>
+  <section class="tags-intro" data-tags-page>
+    <p class="eyebrow">tag view</p>
+    <h1 class="tags-title">从标签进入。</h1>
+    <p class="tags-copy">
+      有些文章彼此关联，但不必强行归档。标签更像细线，把零散的记录轻轻串起来。
+    </p>
 
-    <!-- 所有文章列表（服务器端渲染，每个文章携带标签数组） -->
-    <div class="mt-8 divide-y divide-slate-200 dark:divide-slate-800" data-posts-list>
-      {sortedPosts.map((post) => {
-        const postTags = post.data.tags;
-        const shouldShow = !selectedTag || postTags.includes(selectedTag);
-        return (
-          <div
-            data-post-tags={JSON.stringify(postTags)}
-            class={shouldShow ? "" : "hidden"}
+    <div class="tag-cloud" data-tags-list>
+      <a href="/tags" class="tag-filter is-selected" data-tag-option="">
+        all
+      </a>
+      {
+        allTags.map((tag) => (
+          <a
+            href={`/tags?tag=${encodeURIComponent(tag)}`}
+            class="tag-filter"
+            data-tag-option={tag}
           >
-            <PostCard
-              slug={post.slug}
-              title={post.data.title}
-              date={post.data.date}
-              author={post.data.author}
-              excerpt={post.data.excerpt}
-              tags={postTags}
-              selectedTag={selectedTag}
-            />
-          </div>
-        );
-      })}
-      {selectedTag &&
-        sortedPosts.filter((post) => post.data.tags.includes(selectedTag))
-          .length === 0 && (
-          <p class="py-8 text-sm text-slate-500" data-empty-msg>
-            该标签下暂无文章
-          </p>
-        )}
+            {tag}
+          </a>
+        ))
+      }
     </div>
   </section>
 
-  <style is:inline>
-    /* 默认隐藏所有文章，JavaScript 会立即显示符合条件的 */
-    [data-tags-page] [data-post-tags]:not([data-init-shown]) {
-      display: none;
-    }
-  </style>
+  <section class="tags-results">
+    <div class="section-rule"></div>
+    <div class="post-list" data-posts-list>
+      {posts.map((post) => (
+        <div data-post-tags={JSON.stringify(post.data.tags)}>
+          <PostCard
+            slug={post.slug}
+            title={post.data.title}
+            date={post.data.date}
+            author={post.data.author}
+            excerpt={post.data.excerpt}
+            tags={post.data.tags}
+          />
+        </div>
+      ))}
+      <p class="empty-state hidden" data-empty-msg>
+        当前标签下还没有文章。
+      </p>
+    </div>
+  </section>
 
   <script is:inline>
-    (function initTagsPage() {
-      const tagsPage = document.querySelector('[data-tags-page]');
-      if (!tagsPage) return;
+    (() => {
+      const page = document.querySelector("[data-tags-page]");
+      const list = document.querySelector("[data-posts-list]");
+      if (!page || !list) return;
 
-      const tagsList = tagsPage.querySelector('[data-tags-list]');
-      const postsList = tagsPage.querySelector('[data-posts-list]');
-      if (!tagsList || !postsList) return;
+      const tagOptions = page.querySelectorAll("[data-tag-option]");
+      const postWrappers = list.querySelectorAll("[data-post-tags]");
+      const emptyState = list.querySelector("[data-empty-msg]");
 
-      // 获取查询参数
-      const urlParams = new URLSearchParams(window.location.search);
-      const tagParam = urlParams.get("tag");
-      const selectedTag = tagParam ? decodeURIComponent(tagParam) : null;
+      const applyFilter = () => {
+        const url = new URL(window.location.href);
+        const selectedTag = url.searchParams.get("tag");
+        let visibleCount = 0;
 
-      // 更新标签样式和链接
-      const tagLinks = tagsList.querySelectorAll('[data-tag]');
-      tagLinks.forEach((link) => {
-        const tag = link.getAttribute("data-tag");
-        if (tag && tag === selectedTag) {
-          link.className = "text-sm px-2 py-1 rounded transition-colors text-slate-900 dark:text-slate-100 font-medium";
-          link.href = "/tags";
-        } else if (tag) {
-          link.className = "text-sm px-2 py-1 rounded transition-colors text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300";
-          link.href = `/tags?tag=${encodeURIComponent(tag)}`;
-        }
-      });
+        tagOptions.forEach((option) => {
+          const optionTag = option.getAttribute("data-tag-option");
+          const isSelected = (optionTag || null) === (selectedTag || null);
+          option.classList.toggle("is-selected", isSelected);
+          option.setAttribute(
+            "href",
+            optionTag ? `/tags?tag=${encodeURIComponent(optionTag)}` : "/tags"
+          );
+        });
 
-      // 根据选中的标签过滤显示文章
-      const articleWrappers = postsList.querySelectorAll('[data-post-tags]');
-      let hasVisiblePosts = false;
+        postWrappers.forEach((wrapper) => {
+          const tags = JSON.parse(wrapper.getAttribute("data-post-tags") || "[]");
+          const shouldShow = !selectedTag || tags.includes(selectedTag);
+          wrapper.classList.toggle("hidden", !shouldShow);
+          visibleCount += shouldShow ? 1 : 0;
 
-      // 移除之前可能添加的空消息
-      const existingEmptyMsg = postsList.querySelector('p[data-empty-msg]');
-      if (existingEmptyMsg) {
-        existingEmptyMsg.remove();
-      }
+          const tagLinks = wrapper.querySelectorAll(".post-tag");
+          tagLinks.forEach((tagLink) => {
+            const isActive = tagLink.textContent === `#${selectedTag ?? ""}`;
+            tagLink.classList.toggle("is-selected", isActive);
+          });
+        });
 
-      articleWrappers.forEach((wrapper) => {
-        const tagsJson = wrapper.getAttribute("data-post-tags");
-        if (!tagsJson) {
-          wrapper.classList.add("hidden");
-          return;
-        }
+        emptyState?.classList.toggle("hidden", visibleCount > 0);
+      };
 
-        const tags = JSON.parse(tagsJson);
-        const shouldShow = !selectedTag || tags.includes(selectedTag);
-
-        if (shouldShow) {
-          wrapper.classList.remove("hidden");
-          wrapper.setAttribute("data-init-shown", "true");
-          hasVisiblePosts = true;
-
-          // 更新文章内标签的样式
-          const postCard = wrapper.querySelector("article");
-          if (postCard) {
-            const tagLinks = postCard.querySelectorAll('a[href^="/tags?tag="]');
-            tagLinks.forEach((tagLink) => {
-              const href = tagLink.getAttribute("href");
-              if (href) {
-                const match = href.match(/tag=([^&]+)/);
-                if (match) {
-                  const tag = decodeURIComponent(match[1]);
-                  if (tag === selectedTag) {
-                    tagLink.className = "text-(--brand)";
-                  } else {
-                    tagLink.className = "hover:text-(--brand)";
-                  }
-                }
-              }
-            });
-          }
-        } else {
-          wrapper.classList.add("hidden");
-        }
-      });
-
-      // 如果没有可见的文章，显示提示
-      if (selectedTag && !hasVisiblePosts) {
-        const emptyMsg = document.createElement("p");
-        emptyMsg.className = "py-8 text-sm text-slate-500 dark:text-slate-400";
-        emptyMsg.setAttribute("data-empty-msg", "true");
-        emptyMsg.textContent = "该标签下暂无文章";
-        postsList.appendChild(emptyMsg);
-      }
+      applyFilter();
+      window.addEventListener("popstate", applyFilter);
     })();
   </script>
 </Layout>
+
+<style>
+  .tags-intro {
+    padding: 1.8rem 0 2.4rem;
+  }
+
+  .tags-title {
+    margin: 0.75rem 0 0;
+    color: var(--text);
+    font-size: clamp(1.9rem, 1.4rem + 2vw, 3rem);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+  }
+
+  .tags-copy {
+    max-width: 34rem;
+    margin: 1rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.9;
+  }
+
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 1rem;
+    margin-top: 1.7rem;
+  }
+
+  .tag-filter {
+    color: var(--text-faint);
+    font-size: 0.76rem;
+    letter-spacing: 0.16em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+  }
+
+  .tag-filter:hover,
+  .tag-filter.is-selected {
+    color: var(--brand);
+  }
+
+  .tags-results {
+    padding-bottom: 2rem;
+  }
+
+  .post-list {
+    margin-top: 0.65rem;
+  }
+
+  .empty-state {
+    margin: 1.5rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+</style>

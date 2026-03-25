@@ -1,7 +1,7 @@
 ---
-import Layout from "../../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import PostCard from "../../components/PostCard.astro";
+import Layout from "../../layouts/Layout.astro";
 
 const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
@@ -9,8 +9,17 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
 ---
 
 <Layout>
-  <section class="w-full">
-    <div class="divide-y divide-slate-200 dark:divide-slate-800">
+  <section class="archive-intro">
+    <p class="eyebrow">all essays</p>
+    <h1 class="archive-title">文章索引</h1>
+    <p class="archive-copy">
+      所有公开文章都收在这里，按照时间倒序展开，适合从最近的记录开始往回读。
+    </p>
+  </section>
+
+  <section class="archive-list">
+    <div class="section-rule"></div>
+    <div class="post-list">
       {posts.map((post) => (
         <PostCard
           slug={post.slug}
@@ -24,3 +33,34 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
     </div>
   </section>
 </Layout>
+
+<style>
+  .archive-intro {
+    padding: 1.8rem 0 2.4rem;
+  }
+
+  .archive-title {
+    margin: 0.75rem 0 0;
+    color: var(--text);
+    font-size: clamp(1.9rem, 1.4rem + 2vw, 3rem);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+  }
+
+  .archive-copy {
+    max-width: 34rem;
+    margin: 1rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.9;
+  }
+
+  .archive-list {
+    padding-bottom: 2rem;
+  }
+
+  .post-list {
+    margin-top: 0.65rem;
+  }
+</style>
