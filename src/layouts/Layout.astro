@@ -24,9 +24,6 @@ const splitLastN = (label: string, n = 3) => {
     suffix: chars.slice(-n).join(""),
   };
 };
-
-const showBeian = pathname === "/" || pathname.startsWith("/articles");
-const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
 ---
 
 <!doctype html>
@@ -36,23 +33,10 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
       // 必须在任何内容渲染前执行，防止 FOUC
       (function() {
         try {
-          var theme = localStorage.getItem('theme');
-          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var isDark = theme === 'dark' || (!theme && prefersDark);
-          if (isDark) {
+          const theme = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (theme === 'dark' || (!theme && prefersDark)) {
             document.documentElement.classList.add('dark');
-          }
-          // 延迟更新 favicon，确保 DOM 已加载
-          var updateFav = function() {
-            var favicon = document.getElementById('favicon');
-            if (favicon) {
-              favicon.href = isDark ? '/favicon-dark.svg' : '/favicon-light.svg';
-            }
-          };
-          if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', updateFav);
-          } else {
-            updateFav();
           }
         } catch (e) {
           // localStorage 可能不可用，忽略错误
@@ -67,174 +51,49 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
       html.dark body {
         background-color: #0f172a !important; /* slate-900 */
       }
-      /* 仅暗黑 + header 收缩时，顶部 header 才变黑 */
-      html.dark body.header-shrunk header#main-header {
-        background-color: #000000 !important;
+      html.dark header {
+        background-color: #0f172a !important; /* slate-900 */
         border-bottom-color: #1e293b !important; /* slate-800 */
       }
     </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" id="favicon" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>Zhu Jixiang's Blog</title>
+    <title>Astro Basics</title>
     <style>
       /* 初始状态和缩放状态的样式 */
       header#main-header {
         height: 8rem; /* h-32 = 128px */
-        transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-                    background-color 0.2s, 
-                    border-color 0.2s;
+        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                    background-color 0.3s, 
+                    border-color 0.3s;
       }
 
       header#main-header nav {
-        transition: padding 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       /* 北极星容器样式 */
       #polaris-container {
         top: 8rem; /* 初始位置 128px */
-        transition: top 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      /* 北极星颜色切换动画 */
-      #polaris-container svg {
-        transition: color 0.3s ease;
+      /* 缩放状态下的样式变化 */
+      .header-shrunk header#main-header {
+        height: 56px;
       }
 
-      #polaris-container.polaris-active svg {
-        color: var(--brand) !important;
-      }
-
-      /* 按钮通用风格：Theme Toggle 和 Back to Top */
-      #theme-toggle,
-      #back-to-top {
-        position: relative;
-        background: transparent;
-        z-index: 51;
-        width: 1.25rem;  /* 20px */
-        height: 1.25rem; /* 20px */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        cursor: pointer;
-        outline: none;
-        color: #94a3b8; /* slate-400 */
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      #theme-toggle::before,
-      #back-to-top::before {
-        content: "";
-        position: absolute;
-        inset: -0.375rem; /* 6px 扩展区域 */
-        border-radius: 0.375rem;
-        background-color: transparent;
-        transition: all 0.2s ease;
-        z-index: -1;
-      }
-
-      /* 悬停效果：变色 + 背景出现，无阴影 */
-      #theme-toggle:hover,
-      #back-to-top:hover {
-        color: var(--brand);
-      }
-
-      #theme-toggle:hover::before,
-      #back-to-top:hover::before {
-        background-color: rgb(241 245 249); /* slate-100 */
-      }
-
-      :global(.dark) #theme-toggle:hover::before,
-      :global(.dark) #back-to-top:hover::before {
-        background-color: rgb(30 41 59); /* slate-800 */
-      }
-
-      /* 收缩状态下将主题切换按钮移动到工具栏区域 (仅详情页) */
-      :global(.header-shrunk) #theme-toggle {
-        position: fixed;
-        bottom: 4.5rem;
-        left: calc(50% + min(calc(var(--content-w) / 2), 50vw));
-        margin-left: 1rem;
-      }
-
-      /* 收缩状态下的高度变化 - 使用 :global() 确保能匹配到 body 上的类名 */
-      :global(.header-shrunk) header#main-header {
-        height: 56px !important;
-      }
-
-      :global(.header-shrunk) #polaris-container {
-        top: 56px !important;
-      }
-
-      /* 回到顶部按钮特定逻辑 */
-      #back-to-top {
-        position: fixed;
-        bottom: 2rem;
-        left: calc(50% + min(calc(var(--content-w) / 2), 50vw));
-        margin-left: 1rem;
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(1rem);
-      }
-
-      :global(.header-shrunk) #back-to-top {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateY(0);
-      }
-
-      /* 滚动进度条样式 */
-      #scroll-progress {
-        position: absolute;
-        bottom: -1px;
-        left: 0;
-        width: 100%;
-        height: 0.5px;
-        background-color: var(--brand);
-        transform: scaleX(0);
-        transform-origin: left;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      :global(.header-shrunk) #scroll-progress {
-        opacity: 1;
-      }
-
-      :global(.header-shrunk) #polaris-container {
+      .header-shrunk #polaris-container {
         top: 56px;
       }
 
-      /* 回到顶部按钮样式 */
-      #back-to-top {
-        position: fixed;
-        bottom: 2rem;
-        left: calc(50% + min(calc(var(--content-w) / 2), 50vw));
-        margin-left: 1rem; /* 放在工具区内 */
-        opacity: 0;
-        pointer-events: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: translateY(1rem);
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        z-index: 50;
-        color: #94a3b8; /* slate-400 */
+      /* 缩放时调整内部导航的内边距，实现视觉上的居中 */
+      .header-shrunk header#main-header nav {
+        padding-top: 0;
+        padding-bottom: 0;
       }
-
-      #back-to-top:hover {
-        color: var(--brand);
-      }
-
-      :global(.header-shrunk) #back-to-top {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateY(0);
-      }
-
-      /* 移除对 nav 的额外处理，让其自然随 header 底边缩放 */
     </style>
   </head>
   <body class="bg-white dark:bg-slate-900 transition-colors">
@@ -279,7 +138,7 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
           }
           <button
             id="theme-toggle"
-            class="ml-auto transition-colors"
+            class="ml-auto p-2 rounded-md text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             aria-label="切换主题"
           >
             <svg
@@ -314,8 +173,6 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
         </nav>
         <div></div>
       </div>
-      <!-- 滚动进度条 -->
-      <div id="scroll-progress"></div>
     </header>
     <main class="w-full h-full pt-32">
       <div
@@ -329,11 +186,11 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
       </div>
     </main>
 
-    <!-- 右侧分割线 & 工具栏区域 (Toolbar Area) -->
+    <!-- 右侧分割线（平板及以上屏幕显示） -->
     <div
       class="hidden md:block fixed top-0 left-[calc(50%+min(calc(var(--content-w)/2),50vw))] z-50 h-full w-px bg-slate-200 dark:bg-slate-800 pointer-events-none transition-colors"
     >
-      <!-- 交点四角星（北极星） -->
+      <!-- 交点四角星（类似北极星） -->
       <div
         id="polaris-container"
         class="absolute left-0 -translate-x-1/2 -translate-y-1/2 z-50"
@@ -354,154 +211,37 @@ const beianNo = "鄂ICP备2022002592号-2"; // 请替换为你的备案号
       </div>
     </div>
 
-    <!-- 回到顶部按钮 (位于工具栏区域) -->
-    <button
-      id="back-to-top"
-      aria-label="回到顶部"
-    >
-      <svg
-        class="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2.5"
-          d="M5 15l7-7 7 7"
-        />
-      </svg>
-    </button>
-
-    <!-- 备案号区域：仅首页/文章列表及详情页，固定底部，低调样式 -->
-    {showBeian && (
-      <footer
-        class="beian-footer fixed bottom-0 left-0 right-0 z-10 grid grid-cols-[minmax(0,0fr)_minmax(0,var(--content-w))_minmax(0,0fr)] md:grid-cols-[1fr_minmax(0,var(--content-w))_1fr] px-4 md:px-0 pointer-events-none bg-white dark:bg-slate-900"
-        role="contentinfo"
-      >
-        <div></div>
-        <div class="min-w-0 py-1.5 pr-12 md:pr-12 pl-4">
-          <a
-            href="https://beian.miit.gov.cn/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="beian-link inline-block text-[11px] text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 no-underline transition-colors pointer-events-auto"
-          >
-            {beianNo}
-          </a>
-        </div>
-        <div></div>
-      </footer>
-    )}
-
     <script>
-      // 更新 favicon 的函数
-      function updateFavicon(isDark: boolean) {
-        const favicon = document.getElementById('favicon') as HTMLLinkElement | null;
-        if (favicon) {
-          favicon.href = isDark ? '/favicon-dark.svg' : '/favicon-light.svg';
-        }
-      }
-
       // 主题切换逻辑
       const themeToggle = document.getElementById("theme-toggle");
       themeToggle?.addEventListener("click", () => {
         const isDark = document.documentElement.classList.toggle("dark");
         localStorage.setItem("theme", isDark ? "dark" : "light");
-        updateFavicon(isDark);
       });
 
-      // 监听系统主题变化
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        // 仅在用户未手动设置主题时跟随系统
-        if (!localStorage.getItem('theme')) {
-          const isDark = e.matches;
-          document.documentElement.classList.toggle('dark', isDark);
-          updateFavicon(isDark);
-        }
-      });
-
-      // 回到顶部逻辑
-      const backToTop = document.getElementById("back-to-top");
-      backToTop?.addEventListener("click", () => {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
-      });
-
-      // Header 缩放及滚动交互逻辑
+      // Header 缩放逻辑 (仅在文章详情页生效)
       const header = document.getElementById("main-header");
       const sentinel = document.getElementById("scroll-sentinel");
-      const progressBar = document.getElementById("scroll-progress");
-      const polaris = document.getElementById("polaris-container");
       
-      if (header && sentinel) {
-        // 判断是否为文章详情页
-        const isArticleDetail = window.location.pathname.startsWith('/articles/') && 
-                               window.location.pathname !== '/articles' && 
-                               window.location.pathname !== '/articles/';
+      // 判断是否为文章详情页 (以 /articles/ 开头且不是列表页)
+      const path = window.location.pathname;
+      const isArticleDetail = path.startsWith('/articles/') && path !== '/articles' && path !== '/articles/';
 
-        let ticking = false;
-
-        const updateScrollEffects = () => {
-          const winScroll = window.scrollY;
-          const height = document.documentElement.scrollHeight - window.innerHeight;
-          const scrolled = height > 0 ? winScroll / height : 0;
-          
-          // 1. 更新进度条 (仅在详情页更新)
-          if (isArticleDetail && progressBar) {
-            progressBar.style.transform = `scaleX(${scrolled})`;
-          }
-
-          // 2. 处理北极星变色 (仅在详情页)
-          if (isArticleDetail && polaris) {
-            const polarisRect = polaris.getBoundingClientRect();
-            const currentProgressX = window.innerWidth * scrolled;
-            if (document.body.classList.contains("header-shrunk") && currentProgressX >= polarisRect.left) {
-              polaris.classList.add("polaris-active");
-            } else {
-              polaris.classList.remove("polaris-active");
-            }
-          }
-          
-          ticking = false;
-        };
-
-        window.addEventListener("scroll", () => {
-          if (!ticking) {
-            window.requestAnimationFrame(updateScrollEffects);
-            ticking = true;
-          }
-        }, { passive: true });
-
-        // 1. 使用 Intersection Observer 监听哨兵，控制收缩
+      if (header && sentinel && isArticleDetail) {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
+            // 当哨兵元素完全离开视口时（即滚动超过 128px），在 body 上切换类名
             if (!entry.isIntersecting) {
               document.body.classList.add("header-shrunk");
             } else {
-              // 只要哨兵进入视口（即回到顶部区域），立即恢复高度
               document.body.classList.remove("header-shrunk");
             }
           });
-        }, { threshold: 0 });
+        }, {
+          threshold: 0,
+        });
 
         observer.observe(sentinel);
-
-        // 2. 新增：实时监听页面/窗口尺寸变化，防止缩放死锁
-        const checkState = () => {
-          if (window.scrollY <= 0) {
-            document.body.classList.remove("header-shrunk");
-          }
-        };
-
-        window.addEventListener("resize", checkState);
-        
-        // 如果页面内容是动态的，还可以观察 body 高度
-        const resizeObserver = new ResizeObserver(checkState);
-        resizeObserver.observe(document.body);
       }
     </script>
   </body>
