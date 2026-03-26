@@ -1,6 +1,10 @@
 ---
-import Layout from "../../layouts/Layout.astro";
 import { getCollection } from "astro:content";
+import type { Heading, Root } from "mdast";
+import { remark } from "remark";
+import { visit } from "unist-util-visit";
+import TableOfContents from "../../components/TableOfContents.astro";
+import Layout from "../../layouts/Layout.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts", ({ data }) => !data.draft);
@@ -12,164 +16,154 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await post.render();
+
+const headings: Array<{ id: string; text: string; depth: 2 | 3 }> = [];
+
+const headingPlugin = () => {
+  return (tree: Root) => {
+    visit(tree, "heading", (node) => {
+      const heading = node as Heading;
+      if (heading.depth !== 2 && heading.depth !== 3) return;
+
+      const text = heading.children
+        .map((child) => ("value" in child ? child.value : ""))
+        .join("")
+        .trim();
+
+      if (!text) return;
+
+      const id = text
+        .toLowerCase()
+        .replace(/[^\w\u4e00-\u9fa5\s-]/g, "")
+        .replace(/\s+/g, "-");
+
+      headings.push({ id, text, depth: heading.depth as 2 | 3 });
+    });
+  };
+};
+
+const tree = remark().parse(post.body);
+await remark().use(headingPlugin).run(tree);
+
+const publishDate = post.data.date.toLocaleDateString("zh-CN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 ---
 
 <Layout>
-  <article class="w-full pb-12">
-    <!-- 文章头部：运用设计四原则 -->
-    <div class="article-header mt-5">
-      <!-- 核心内容组：标题 + 摘要（亲密性） -->
-      <div class="article-hero">
-        <h1 class="article-title">
-          {post.data.title}
-        </h1>
-        <p class="article-excerpt">{post.data.excerpt}</p>
-      </div>
+  <article class="article-shell">
+    <header class="article-header prose-shell">
+      <p class="eyebrow">essay</p>
+      <h1 class="article-title">{post.data.title}</h1>
+      <p class="article-excerpt">{post.data.excerpt}</p>
 
-      <!-- 元信息组：日期 + 作者 + 标签（亲密性 + 对比） -->
       <div class="article-meta">
-        <div class="meta-row">
-          <time datetime={post.data.date.toISOString()} class="meta-date">
-            {
-              post.data.date.toLocaleDateString("zh-CN", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-            }
-          </time>
-          <span class="meta-divider"></span>
-          <span class="meta-author">{post.data.author}</span>
-        </div>
-        <div class="meta-tags">
-          {
-            post.data.tags.map((tag) => (
-              <a
-                href={`/tags?tag=${encodeURIComponent(tag)}`}
-                class="tag-link"
-              >
-                {tag}
-              </a>
-            ))
-          }
-        </div>
+        <span>{publishDate}</span>
+        <span class="article-meta-dot"></span>
+        <span>{post.data.author}</span>
       </div>
-    </div>
 
-    <div class="mt-8 md-content">
+      <div class="article-tags">
+        {post.data.tags.map((tag) => (
+          <a href={`/tags?tag=${encodeURIComponent(tag)}`} class="article-tag">
+            #{tag}
+          </a>
+        ))}
+      </div>
+    </header>
+
+    <div class="article-body md-content">
       <Content />
     </div>
   </article>
+
+  {headings.length > 0 && <TableOfContents items={headings} />}
 </Layout>
 
 <style>
-  /* 文章头部容器 */
+  .article-shell {
+    padding: 1.6rem 0 2rem;
+  }
+
   .article-header {
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    padding-bottom: 2.2rem;
+    border-bottom: 1px solid var(--line);
   }
 
-  :global(.dark) .article-header {
-    --border-color: #1e293b;
-  }
-
-  /* 核心内容组 - 标题和摘要紧密关联 */
-  .article-hero {
-    margin-bottom: 1.5rem;
-  }
-
-  /* 标题 - 最高对比度，视觉焦点 */
   .article-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    line-height: 1.3;
-    letter-spacing: -0.02em;
-    color: #0f172a;
-    margin: 0;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(2rem, 1.45rem + 2.4vw, 3.6rem);
+    font-weight: 500;
+    line-height: 1.22;
+    letter-spacing: -0.035em;
   }
 
-  :global(.dark) .article-title {
-    color: #f1f5f9;
-  }
-
-  /* 摘要 - 作为导语，与正文相近，颜色稍淡 */
   .article-excerpt {
-    margin-top: 0.75rem;
-    font-size: 0.9375rem;
-    line-height: 1.7;
-    color: #475569;
-    max-width: 42rem;
+    max-width: 36rem;
+    margin: 1.2rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.96rem;
+    line-height: 1.95;
   }
 
-  :global(.dark) .article-excerpt {
-    color: #94a3b8;
-  }
-
-  /* 元信息组 - 低对比度，次要信息 */
   .article-meta {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .meta-row {
-    display: flex;
     align-items: center;
-    gap: 0.75rem;
-    font-size: 0.875rem;
-    color: #64748b;
+    gap: 0.7rem;
+    margin-top: 1.5rem;
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
 
-  :global(.dark) .meta-row {
-    color: #64748b;
+  .article-meta-dot {
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.5;
   }
 
-  .meta-date {
-    font-variant-numeric: tabular-nums;
-  }
-
-  .meta-divider {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background-color: currentColor;
-    opacity: 0.4;
-  }
-
-  .meta-author {
-    font-weight: 500;
-  }
-
-  /* 标签组 - 独立分组，使用品牌色建立重复性 */
-  .meta-tags {
+  .article-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.85rem;
+    margin-top: 1rem;
   }
 
-  .tag-link {
-    display: inline-block;
-    padding: 0.25rem 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 500;
+  .article-tag {
     color: var(--brand);
-    background-color: color-mix(in srgb, var(--brand) 8%, transparent);
-    border-radius: 9999px;
-    transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: opacity 0.2s ease;
   }
 
-  .tag-link:hover {
-    background-color: color-mix(in srgb, var(--brand) 15%, transparent);
+  .article-tag:hover {
+    opacity: 0.72;
   }
 
-  /* 响应式：小屏幕标题稍小 */
-  @media (max-width: 640px) {
-    .article-title {
-      font-size: 1.25rem;
+  .article-body {
+    padding-top: 2.2rem;
+  }
+
+  @media (max-width: 767px) {
+    .article-shell {
+      padding-top: 1rem;
     }
 
     .article-excerpt {
-      font-size: 0.875rem;
+      font-size: 0.91rem;
+    }
+
+    .article-meta {
+      flex-wrap: wrap;
+      gap: 0.5rem 0.7rem;
     }
   }
 </style>

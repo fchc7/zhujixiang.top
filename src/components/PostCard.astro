@@ -20,40 +20,134 @@ const {
 } = Astro.props;
 
 const dateObj = typeof date === "string" ? new Date(date) : date;
-const dateStr = dateObj.toLocaleDateString("zh-CN", {
+const dateLabel = dateObj.toLocaleDateString("zh-CN", {
   year: "numeric",
-  month: "long",
-  day: "numeric",
+  month: "2-digit",
+  day: "2-digit",
 });
 ---
 
-<article class="py-8">
-  <div class="text-xs text-slate-500 dark:text-slate-400">
-    <time datetime={dateObj.toISOString()}>
-      {dateStr}
-    </time>
-    <span class="mx-2">by</span>
+<article class="post-entry group">
+  <div class="post-meta">
+    <time datetime={dateObj.toISOString()}>{dateLabel}</time>
+    <span class="post-meta-divider"></span>
     <span>{author}</span>
   </div>
 
-  <h2 class="mt-2 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-    <a href={`/articles/${slug}`} class="hover:text-(--brand)">
-      {title}
-    </a>
-  </h2>
-
-  <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
-    {excerpt}
-  </p>
-
-  <div class="mt-4 flex flex-wrap gap-x-3 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
-    {tags.map((tag) => (
-      <a
-        href={`/tags?tag=${encodeURIComponent(tag)}`}
-        class={tag === selectedTag ? "text-(--brand)" : "hover:text-(--brand)"}
-      >
-        #{tag}
+  <div class="post-main">
+    <h2 class="post-title">
+      <a href={`/articles/${slug}`} class="post-link">
+        {title}
       </a>
-    ))}
+    </h2>
+
+    <p class="post-excerpt">{excerpt}</p>
+
+    <div class="post-tags">
+      {tags.map((tag) => (
+        <a
+          href={`/tags?tag=${encodeURIComponent(tag)}`}
+          class={`post-tag ${tag === selectedTag ? "is-selected" : ""}`}
+        >
+          #{tag}
+        </a>
+      ))}
+    </div>
   </div>
 </article>
+
+<style>
+  .post-entry {
+    display: grid;
+    gap: 1rem;
+    padding: 1.75rem 0;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .post-meta-divider {
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.5;
+  }
+
+  .post-main {
+    min-width: 0;
+  }
+
+  .post-title {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.45rem);
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+  }
+
+  .post-link {
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .group:hover .post-link {
+    color: var(--brand);
+  }
+
+  .post-excerpt {
+    margin: 0.9rem 0 0;
+    max-width: 34rem;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.95;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 1rem;
+  }
+
+  .post-tag {
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+  }
+
+  .post-tag:hover,
+  .post-tag.is-selected {
+    color: var(--brand);
+  }
+
+  @media (min-width: 768px) {
+    .post-entry {
+      grid-template-columns: minmax(0, 8.5rem) minmax(0, 1fr);
+      gap: 1.5rem;
+      padding: 2.2rem 0;
+    }
+
+    .post-meta {
+      align-items: flex-start;
+      gap: 0.45rem;
+      flex-direction: column;
+      padding-top: 0.25rem;
+    }
+
+    .post-meta-divider {
+      display: none;
+    }
+  }
+</style>

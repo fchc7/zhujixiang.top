@@ -1,16 +1,37 @@
 ---
-import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import PostCard from "../components/PostCard.astro";
+import Layout from "../layouts/Layout.astro";
 
 const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
+
+const allTags = new Set<string>();
+for (const post of posts) {
+  for (const tag of post.data.tags) allTags.add(tag);
+}
 ---
 
 <Layout>
-  <section class="w-full">
-    <div class="divide-y divide-slate-200 dark:divide-slate-800">
+  <section class="home-intro">
+    <p class="eyebrow">writing archive</p>
+    <h1 class="home-title">在留白里写下技术、日常与缓慢的思考。</h1>
+    <p class="home-copy">
+      这里收集一些关于开发、工具、感受和片段式经验的记录。文章不会很多，
+      但希望每一篇都足够安静，也足够耐读。
+    </p>
+
+    <div class="home-meta">
+      <span>{posts.length.toString().padStart(2, "0")} posts</span>
+      <span>{allTags.size.toString().padStart(2, "0")} tags</span>
+      <a href="/tags" class="home-meta-link">browse by tag</a>
+    </div>
+  </section>
+
+  <section class="post-index">
+    <div class="section-rule"></div>
+    <div class="post-list">
       {posts.map((post) => (
         <PostCard
           slug={post.slug}
@@ -24,3 +45,60 @@ const posts = (await getCollection("posts", ({ data }) => !data.draft)).sort(
     </div>
   </section>
 </Layout>
+
+<style>
+  .home-intro {
+    padding: 2rem 0 2.75rem;
+  }
+
+  .home-title {
+    max-width: 11ch;
+    margin: 0.85rem 0 0;
+    color: var(--text);
+    font-size: clamp(2.25rem, 1.45rem + 3vw, 4.8rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+  }
+
+  .home-copy {
+    max-width: 34rem;
+    margin: 1.35rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.96rem;
+    line-height: 2;
+  }
+
+  .home-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem 1.3rem;
+    margin-top: 1.6rem;
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+  }
+
+  .home-meta-link {
+    color: var(--brand);
+    text-decoration: none;
+  }
+
+  .post-index {
+    padding-bottom: 2rem;
+  }
+
+  .post-list {
+    margin-top: 0.65rem;
+  }
+
+  @media (max-width: 767px) {
+    .home-intro {
+      padding-top: 1.2rem;
+    }
+
+    .home-copy {
+      font-size: 0.9rem;
+    }
+  }
+</style>
